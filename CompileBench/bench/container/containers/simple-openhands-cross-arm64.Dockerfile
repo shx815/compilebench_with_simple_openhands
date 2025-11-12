@@ -1,0 +1,36 @@
+# ================================================================
+# CompileBench Wrapper for simple-openhands with ARM64 Cross-Compilation
+# ================================================================
+# This Dockerfile extends the simple-openhands image with shell-harness
+# and ARM64 cross-compilation tools (qemu-user-static) to make it 
+# compatible with CompileBench ARM64 testing tasks.
+#
+# This mirrors the functionality of ubuntu-22.04-amd64-cross-arm64
+# but uses the simple-openhands base for controlled comparison.
+# ================================================================
+
+# Base image - using remote registry
+FROM simple-openhands:latest
+
+# CompileBench standard environment settings
+ENV DEBIAN_FRONTEND=noninteractive \
+    WORK_DIR=/home/peter \
+    USERNAME=peter
+SHELL ["/bin/bash", "-lc"]
+
+# Switch to root to install dependencies
+USER root
+
+RUN sudo apt-get update \
+    && sudo apt-get install -y qemu-user-static
+
+
+# Set working directory for CompileBench tasks
+WORKDIR /home/peter
+
+# Switch to peter user
+USER peter
+
+# Override CMD for CompileBench HTTP API mode
+CMD ["/bin/bash", "-c", "cd /simple_openhands/code && source /etc/environment && /simple_openhands/micromamba/bin/micromamba run -n simple_openhands poetry run python -m simple_openhands.main"]
+
