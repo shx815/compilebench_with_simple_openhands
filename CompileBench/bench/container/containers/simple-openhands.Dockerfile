@@ -35,6 +35,10 @@ RUN printf "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:
 RUN printf "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\nexport LANG=C.UTF-8\nexport LC_ALL=C.UTF-8\n" > /etc/compilebench_bash_env
 ENV BASH_ENV=/etc/compilebench_bash_env
 
+# Install shell-harness for verification stage
+COPY --from=ghcr.io/quesmaorg/compilebench:shell-harness-latest /out/shell-harness /bin/shell-harness
+RUN chmod 0755 /bin/shell-harness
+
 # Remove any global ld.so injection of /home/peter/result/lib and refresh cache
 RUN rm -f /etc/ld.so.conf.d/compilebench.conf && ldconfig
 

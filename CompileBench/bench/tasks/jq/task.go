@@ -284,7 +284,7 @@ func (t WindowsTask) EvaluateCorrectness(c *container.ContainerInstance) *tasks.
 
 	// Create a wrapper script which runs the binary through wine
 	// All checks from now on will run through this wrapper script
-	_, err = c.RunBashScript(`
+	_, err = c.RunValidationBashScript(`
 		echo '#!/bin/bash
 exec wine /home/peter/result/jq.exe "$@" 2>/dev/null' > /home/peter/result/jq
 		chmod +x /home/peter/result/jq
