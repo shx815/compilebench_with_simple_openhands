@@ -159,11 +159,6 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates \
     && update-ca-certificates
 
-# 运行时优先搜索任务前缀库
-RUN printf "/home/peter/result/lib\n" > /etc/ld.so.conf.d/compilebench.conf && ldconfig
-USER peter
-
-
 # 切换到用户
 USER peter
 

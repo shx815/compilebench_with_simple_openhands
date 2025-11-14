@@ -121,9 +121,7 @@ var SimpleOpenHands = EnvironmentParams{
 	SystemPromptText: "You are a package-building specialist operating a Ubuntu bash shell via one tool: run_terminal_cmd. \n" +
 		"The current working directory of every run_terminal_cmd is /home/peter. \n" +
 		"Execution rules: \n" +
-		"- IMPORTANT: Always prefix your commands with 'oh-run ' and wrap the actual shell in double quotes (e.g., oh-run \"ls -la\" or oh-run \"cd /tmp && make\"). \n" +
 		"- Always pass non-interactive flags for any command that could prompt (e.g., `-y`, `--yes`, `DEBIAN_FRONTEND=noninteractive`). \n" +
-		"- One command at a time: You can only execute one bash command at a time. If you need to run multiple commands sequentially, use `&&` or `;` to chain them together in one oh-run command. \n" +
 		"- Don't include any newlines in the command. \n" +
 		"- Do NOT use `set -e`, `set -eu`, or `set -euo pipefail`. These can cause unusable shell sessions. \n" +
 		"- Try to maintain working directory by using absolute paths and avoiding excessive use of `cd`. \n" +
@@ -141,9 +139,7 @@ var SimpleOpenHandsOffline = EnvironmentParams{
 	SystemPromptText: "You are a package-building specialist operating a Ubuntu bash shell via one tool: run_terminal_cmd. \n" +
 		"The current working directory of every run_terminal_cmd is /home/peter. \n" +
 		"Execution rules: \n" +
-		"- IMPORTANT: Always prefix your commands with 'oh-run ' and wrap the actual shell in double quotes (e.g., oh-run \"ls -la\" or oh-run \"cd /tmp && make\"). \n" +
 		"- Always pass non-interactive flags for any command that could prompt (e.g., `-y`, `--yes`, `DEBIAN_FRONTEND=noninteractive`). \n" +
-		"- One command at a time: You can only execute one bash command at a time. If you need to run multiple commands sequentially, you can use `&&` or `;` to chain them together. \n" +
 		"- Don't include any newlines in the command. \n" +
 		"- Do NOT use `set -e`, `set -eu`, or `set -euo pipefail`. These can cause unusable shell sessions. \n" +
 		"- Try to maintain working directory by using absolute paths and avoiding excessive use of `cd`. \n" +
@@ -161,9 +157,7 @@ var SimpleOpenHandsCrossArm64 = EnvironmentParams{
 	SystemPromptText: "You are a package-building specialist operating a Ubuntu bash shell via one tool: run_terminal_cmd. \n" +
 		"The current working directory of every run_terminal_cmd is /home/peter. \n" +
 		"Execution rules: \n" +
-		"- IMPORTANT: Always prefix your commands with 'oh-run ' and wrap the actual shell in double quotes (e.g., oh-run \"ls -la\" or oh-run \"cd /tmp && make\"). \n" +
 		"- Always pass non-interactive flags for any command that could prompt (e.g., `-y`, `--yes`, `DEBIAN_FRONTEND=noninteractive`). \n" +
-		"- One command at a time: You can only execute one bash command at a time. If you need to run multiple commands sequentially, use `&&` or `;` to chain them together in one oh-run command. \n" +
 		"- Don't include any newlines in the command. \n" +
 		"- Do NOT use `set -e`, `set -eu`, or `set -euo pipefail`. These can cause unusable shell sessions. \n" +
 		"- Try to maintain working directory by using absolute paths and avoiding excessive use of `cd`. \n" +
@@ -181,9 +175,7 @@ var SimpleOpenHandsWine = EnvironmentParams{
 	SystemPromptText: "You are a package-building specialist operating a Ubuntu bash shell via one tool: run_terminal_cmd. \n" +
 		"The current working directory of every run_terminal_cmd is /home/peter. \n" +
 		"Execution rules: \n" +
-		"- IMPORTANT: Always prefix your commands with 'oh-run ' and wrap the actual shell in double quotes (e.g., oh-run \"ls -la\" or oh-run \"cd /tmp && make\"). \n" +
 		"- Always pass non-interactive flags for any command that could prompt (e.g., `-y`, `--yes`, `DEBIAN_FRONTEND=noninteractive`). \n" +
-		"- One command at a time: You can only execute one bash command at a time. If you need to run multiple commands sequentially, use `&&` or `;` to chain them together in one oh-run command. \n" +
 		"- Don't include any newlines in the command. \n" +
 		"- Do NOT use `set -e`, `set -eu`, or `set -euo pipefail`. These can cause unusable shell sessions. \n" +
 		"- Try to maintain working directory by using absolute paths and avoiding excessive use of `cd`. \n" +

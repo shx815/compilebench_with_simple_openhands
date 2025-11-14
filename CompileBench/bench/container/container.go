@@ -23,7 +23,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"unicode"
 )
 
 // ContainerInstance mirrors the Python ContainerInstance but implemented in Go.
@@ -379,16 +378,17 @@ func (c *ContainerInstance) execWithHarness(command string, timeoutSeconds float
 	return truncateOutput(resp.Output), nil
 }
 
-func (c *ContainerInstance) execWithOHRun(args []string, timeoutSeconds float64) (string, error) {
-	if len(args) == 0 || args[0] != "oh-run" {
-		return "", fmt.Errorf("oh-run invocation must start with 'oh-run'")
-	}
-
+func (c *ContainerInstance) execWithOHRun(command string, timeoutSeconds float64) (string, error) {
 	ctxWithTimeout, cancel := context.WithTimeout(c.ctx, time.Duration(timeoutSeconds*float64(time.Second)))
 	defer cancel()
 
 	if _, err := exec.LookPath("oh-run"); err != nil {
 		return "", fmt.Errorf("oh-run not found in PATH: %w", err)
+	}
+
+	trimmed := strings.TrimSpace(command)
+	if trimmed == "" {
+		return "", fmt.Errorf("empty command")
 	}
 
 	env := os.Environ()
@@ -398,10 +398,10 @@ func (c *ContainerInstance) execWithOHRun(args []string, timeoutSeconds float64)
 		env = append(env, fmt.Sprintf("OH_API_KEY=%s", key))
 	}
 
-	cmd := exec.CommandContext(ctxWithTimeout, args[0], args[1:]...)
+	cmd := exec.CommandContext(ctxWithTimeout, "oh-run", trimmed)
 	cmd.Env = env
 
-	slog.Info("Executing oh-run command", "command", strings.Join(args, " "), "api_url", apiURL)
+	slog.Info("Executing oh-run command", "command", trimmed, "api_url", apiURL)
 
 	out, errOut, code, runErr := runCommand(cmd)
 	if runErr != nil || code != 0 {
@@ -454,11 +454,7 @@ func (c *ContainerInstance) execViaDockerShellHarness(command string, timeoutSec
 // Run executes a command: in OH mode via oh-run on host; otherwise via shell-harness.
 func (c *ContainerInstance) Run(command string) (string, error) {
 	if c.UseOHRun {
-		args, err := prepareOHRunArgs(command)
-		if err != nil {
-			return "", err
-		}
-		return c.execWithOHRun(args, c.CommandTimeout)
+		return c.execWithOHRun(command, c.CommandTimeout)
 	}
 	return c.execWithHarness(command, c.CommandTimeout)
 }
@@ -666,92 +662,4 @@ func (c *ContainerInstance) Download(destinationPath, url string) error {
 // shellQuote is a minimal quote helper for bash -lc contexts.
 func shellQuote(s string) string {
 	return "'" + strings.ReplaceAll(s, "'", "'\\''") + "'"
-}
-
-func splitCommandLine(input string) ([]string, error) {
-	var args []string
-	var current strings.Builder
-	inSingle := false
-	inDouble := false
-	escape := false
-
-	flush := func() {
-		if current.Len() > 0 {
-			args = append(args, current.String())
-			current.Reset()
-		}
-	}
-
-	for _, r := range input {
-		switch {
-		case escape:
-			current.WriteRune(r)
-			escape = false
-		case r == '\\':
-			if inSingle {
-				current.WriteRune(r)
-			} else {
-				escape = true
-			}
-		case r == '\'':
-			if inDouble {
-				current.WriteRune(r)
-			} else {
-				inSingle = !inSingle
-			}
-		case r == '"':
-			if inSingle {
-				current.WriteRune(r)
-			} else {
-				inDouble = !inDouble
-			}
-		case unicode.IsSpace(r):
-			if inSingle || inDouble {
-				current.WriteRune(r)
-			} else {
-				flush()
-			}
-		default:
-			current.WriteRune(r)
-		}
-	}
-
-	if escape {
-		return nil, fmt.Errorf("unterminated escape sequence in command: %s", input)
-	}
-	if inSingle || inDouble {
-		return nil, fmt.Errorf("unterminated quote in command: %s", input)
-	}
-
-	flush()
-	return args, nil
-}
-
-func prepareOHRunArgs(command string) ([]string, error) {
-	trimmed := strings.TrimSpace(command)
-	if trimmed == "" {
-		return nil, fmt.Errorf("empty command")
-	}
-
-	if trimmed == "oh-run" || strings.HasPrefix(trimmed, "oh-run ") {
-		args, err := splitCommandLine(trimmed)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse command for oh-run: %w", err)
-		}
-		if len(args) == 0 || args[0] != "oh-run" {
-			return nil, fmt.Errorf("command must start with 'oh-run': %s", command)
-		}
-		if len(args) == 1 {
-			return nil, fmt.Errorf("oh-run invocation missing command payload: %s", command)
-		}
-		return args, nil
-	}
-
-	return []string{"oh-run", trimmed}, nil
-}
-
-// UsingOHRun reports whether this container instance is configured to use the
-// Simple OpenHands (oh-run) runtime instead of shell-harness.
-func (c *ContainerInstance) UsingOHRun() bool {
-	return c.UseOHRun
 }
